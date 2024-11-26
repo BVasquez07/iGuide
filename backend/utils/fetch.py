@@ -9,13 +9,17 @@ def getResponse(prompt: str) -> str:
         model="gpt-4o-mini",
         messages=[
             {
-                "role": "system", 
-                "content": "You are a helpful assistant."
+                "role": "system",
+                "content": "You are a helpful assistant assigned as a guide for Blind and low vision users, you serve as the vocal interface for a robotic dog spot."
             },
             {
                 "role": "user",
                 "content": prompt
-            }
+            },
+            {
+                "role": "assistant",
+                "content": "no cache available"
+            },
         ]
     )
     return completion.choices[0].message.content
