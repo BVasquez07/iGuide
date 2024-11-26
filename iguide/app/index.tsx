@@ -1,21 +1,5 @@
 import { Text, View, Button, Pressable } from "react-native";
-import { fetch } from 'expo/fetch';
 import React, { useEffect, useState } from "react";
-
-
-// const resp = await fetch('https://httpbin.org/drip?numbytes=512&duration=2', {
-//   headers: { Accept: 'text/event-stream' },
-// });
-// const reader = resp.body.getReader();
-// const chunks = [];
-// while (true) { /* possibly pushing the chunks onto the buffer.... */
-//   const { done, value } = await reader.read();
-//   if (done) {
-//     break;
-//   }
-//   chunks.push(value);
-// }
-
 
 export default function Index() {
   const [fetchData, setFetchedData] = useState(null);
@@ -38,26 +22,14 @@ export default function Index() {
   }, [clicked]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Button
-        onPress={() => {
-          setClicked(true);
-          setClicked(false);
-        }}
-        title="Get Data"
-        color="#841584"
-        accessibilityLabel="Click here"
-      />
+    <View className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-800">
       <Pressable className="p-4 bg-white dark:bg-black" onPress={() => setClicked(true)} onPressOut={() => setClicked(false)}>
         <Text>I'm pressable!</Text>
       </Pressable>
-      <Text style={{ fontSize: 24 }}>Text from the API: {fetchData}</Text>
+      <View className="flex-auto p-10">
+        <Text className="m-b 1" style={{ fontSize: 12 }}>Response:</Text>
+        <Text style={{ fontSize: 12 }}>{fetchData}</Text>
+      </View>
     </View>
   );
 }

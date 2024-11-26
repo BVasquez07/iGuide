@@ -1,9 +1,6 @@
-from flask import Flask, jsonify
-from dotenv import load_dotenv
+from flask import Flask, jsonify, Request
 import utils.fetch
 from random import randint
-
-load_dotenv()
 
 app = Flask(__name__)
 
@@ -16,7 +13,7 @@ def root():
 def gptRes():
     return jsonify(
         {
-            "data": f'This will deliver and get the response payload from gpt for now we have a random num here: {randint(1, 1000)}'
+            "data": utils.fetch.getResponse("What is hololive?")
          })
 
 
