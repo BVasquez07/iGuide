@@ -3,10 +3,13 @@
   <a href="https://gitpoint.co/">
     <img alt="GitPoint" title="GitPoint" src="http://i.imgur.com/VShxJHs.png" width="450">
   </a>
+  <a href="https://github.com/BVasquez07/iGuide/tree/main" target="_blank">
+    <img alt="iGuide" title="iGuide" src="./iguide/assets/images/logo.png" width="450">
+  </a>
 </p>
 
 <p align="center">
-  GitHub in your pocket. Built with React Native.
+  Experience the world through your AI companion.
 </p>
 
 <p align="center">
