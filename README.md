@@ -1,8 +1,5 @@
 <h1 align="center"> iGuide </h1> <br>
 <p align="center">
-  <a href="https://gitpoint.co/">
-    <img alt="GitPoint" title="GitPoint" src="http://i.imgur.com/VShxJHs.png" width="450">
-  </a>
   <a href="https://github.com/BVasquez07/iGuide/tree/main" target="_blank">
     <img alt="iGuide" title="iGuide" src="./iguide/assets/images/logo.png" width="450">
   </a>
