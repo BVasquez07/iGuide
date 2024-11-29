@@ -7,14 +7,18 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  Pressable,
-  TouchableHighlight
+  ActivityIndicator,
+  TouchableHighlight,
+  FlatList
 } from 'react-native';
 
+
 const UserTxtInput = () => {
-  const [fetchData, setFetchedData] = useState("Currently there is no response...");
+  const defaultText = "Currently there is no response..."
+  const [fetchData, setFetchedData] = useState(defaultText);
   const [clicked, setClicked] = useState(false);
   const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
   
   const fetching = (userPromp: String) => {
     fetch('http://localhost:3060/gptRes', 
@@ -30,9 +34,12 @@ const UserTxtInput = () => {
         return res.json()
       })
       .then((data) => {
+        setLoading(false);
         return setFetchedData(data.data);
       })
       .catch((err) => {
+        setLoading(false);
+        setFetchedData("There was an error with your request please try later");
         return err;
       });
   }
@@ -54,14 +61,12 @@ const UserTxtInput = () => {
                 onChangeText={text => setPrompt(text)}/>
             </View>
             <View>
-              {/* <Pressable className="p-4 w-fit rounded-lg bg-white dark:bg-black items-center" 
-                onPress={() => setClicked(true)} 
-                onPressOut={() => setClicked(false)}
-              >
-                <Text>Generate</Text>
-              </Pressable> */}
-              <TouchableHighlight className="p-4 w-fit rounded-lg bg-grey dark:bg-black items-center" 
-                onPress={() => setClicked(prev => !prev)} 
+              <TouchableHighlight 
+                className="p-4 w-fit rounded-lg bg-grey dark:bg-black items-center" 
+                onPress={() => {
+                  setLoading(true);
+                  setClicked(prev => !prev);
+                }}
                 underlayColor="white">
                 <View>
                   <Text>Generate</Text>
@@ -72,8 +77,11 @@ const UserTxtInput = () => {
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
       <View className='p-5 mt-4 w-[250px]'>
-        <Text style={{ fontSize: 15 }}>{fetchData}</Text>
+        {loading
+          ? <ActivityIndicator size="small" color="#0000ff" /> 
+          : <Text style={{ fontSize: 15 }}>{fetchData}</Text>}
       </View>
+
     </View>
   );
 };
