@@ -76,7 +76,7 @@ const UserTxtInput = () => {
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-      <View className='p-5 mt-4 w-[250px]'>
+      <View className='p-2 mt-4 w-[250px]'>
         {loading
           ? <ActivityIndicator size="small" color="#0000ff" /> 
           : <Text style={{ fontSize: 15 }}>{fetchData}</Text>}

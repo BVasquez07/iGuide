@@ -1,16 +1,12 @@
-from openai import OpenAI
-from dotenv import dotenv_values
-import os
-config = dotenv_values(".env")
-client = OpenAI(api_key=config["gptKey"])
+from config import config
 
-def getResponse(prompt: str) -> str:
+def getResponse(prompt: str, client) -> str:
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful assistant assigned as a guide for Blind and low vision users, you serve as the vocal interface for a robotic dog spot."
+                "content": config["SystemMessage"]
             },
             {
                 "role": "user",
