@@ -11,6 +11,7 @@ import {
   TouchableHighlight,
   FlatList
 } from 'react-native';
+import * as Speech from 'expo-speech';
 
 
 const UserTxtInput = () => {
@@ -19,6 +20,7 @@ const UserTxtInput = () => {
   const [clicked, setClicked] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [speakCount, setSpeakCount] = useState(0);
   
   const fetching = (userPromp: String) => {
     fetch('http://localhost:3060/gptRes', 
@@ -43,6 +45,11 @@ const UserTxtInput = () => {
         return err;
       });
   }
+  const vocalize = (textToSay: string) : string => {
+    Speech.speak(textToSay);
+    setSpeakCount(0);
+    return "";
+  }
 
   useEffect(() => {
     fetching(prompt);
@@ -66,6 +73,7 @@ const UserTxtInput = () => {
                 onPress={() => {
                   setLoading(true);
                   setClicked(prev => !prev);
+                  setSpeakCount(1);
                 }}
                 underlayColor="white">
                 <View>
@@ -79,7 +87,11 @@ const UserTxtInput = () => {
       <View className='p-2 mt-4 w-[250px]'>
         {loading
           ? <ActivityIndicator size="small" color="#0000ff" /> 
-          : <Text style={{ fontSize: 15 }}>{fetchData}</Text>}
+          : <Text style={{ fontSize: 15 }}>
+              {fetchData}
+              {speakCount === 1 ? vocalize(fetchData) : null}
+            </Text>}
+        
       </View>
 
     </View>
