@@ -12,24 +12,52 @@ import {
   FlatList
 } from 'react-native';
 import * as Speech from 'expo-speech';
+import * as ImagePicker from 'expo-image-picker';
+
+// for understanding how to pick image from the library the image we can use the following: https://docs.expo.dev/tutorial/image-picker/
+//
+//
+//
+//
+
+/*
+
+The idea for handling sending the image and text payload will be the following:
+
+User can at any time just submit a query otherwise they 
 
 
-const UserTxtInput = () => {
+The below has to be restructured to instead send a form to the backend
+with the appropriate keys which are 
+{
+  image: image.jpg,
+  prompt: "the prompt"
+}
+
+*/
+
+const TextToSpeech = () => {
   const defaultText = "Currently there is no response..."
   const [fetchData, setFetchedData] = useState(defaultText);
   const [clicked, setClicked] = useState(false);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [speakCount, setSpeakCount] = useState(0);
-  
-  const fetching = (userPromp: String) => {
-    fetch('http://localhost:3060/gptRes', 
+
+  const fetching = (userPrompt: String) => {
+    const formData = new FormData();
+    const blob = new Blob([''], {type: 'image/jpg'}); 
+    //images come in as blobs so we have to work on it here!
+    //we should check if any of the data is null or not available here.
+    formData.append('prompt', String(userPrompt));
+    formData.append('image', blob, 'image.jpg');
+    fetch('http://localhost:3060/recievepayload', //this endpoint should be in a config or .env file
       {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
-        body: JSON.stringify({prompt: userPromp}),
+        body: formData,
         mode: 'cors',
       })
       .then((res) =>{
@@ -45,7 +73,7 @@ const UserTxtInput = () => {
         return err;
       });
   }
-  const vocalize = (textToSay: string) : string => {
+  const vocalize = (textToSay: string) : string => { // this is the built in speak service that expo has!
     Speech.speak(textToSay);
     setSpeakCount(0);
     return "";
@@ -91,11 +119,9 @@ const UserTxtInput = () => {
               {fetchData}
               {speakCount === 1 ? vocalize(fetchData) : null}
             </Text>}
-        
       </View>
-
     </View>
   );
 };
 
-export default UserTxtInput;
+export default TextToSpeech;

@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
-import UserTxtInput from "./components/UserTxtInput";
+import UserTxtInput from "./components/TextToSpeech";
+import AudioRecording from "./components/AudioRecording";
 import {GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 
 
