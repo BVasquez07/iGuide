@@ -9,32 +9,20 @@ import {
   Keyboard,
   ActivityIndicator,
   TouchableHighlight,
-  FlatList
+  FlatList,
+  StyleSheet,
+  Button
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as ImagePicker from 'expo-image-picker';
+import { useAudioPlayer } from 'expo-audio';
+import colors from 'tailwindcss/colors';
 
-// for understanding how to pick image from the library the image we can use the following: https://docs.expo.dev/tutorial/image-picker/
-//
-//
-//
-//
+// for understanding how to pick image from the library the image 
+// we can use the following: https://docs.expo.dev/tutorial/image-picker/
+//here we will need a default audio for the default prompt of errors and such.
+//either that or we can handle most of that on the backend.
 
-/*
-
-The idea for handling sending the image and text payload will be the following:
-
-User can at any time just submit a query otherwise they 
-
-
-The below has to be restructured to instead send a form to the backend
-with the appropriate keys which are 
-{
-  image: image.jpg,
-  prompt: "the prompt"
-}
-
-*/
 
 const TextToSpeech = () => {
   const defaultText = "Currently there is no response..."
@@ -43,6 +31,7 @@ const TextToSpeech = () => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [speakCount, setSpeakCount] = useState(0);
+  //below is for recording audio with ExpoAudio module
 
   const fetching = (userPrompt: String) => {
     const formData = new FormData();
@@ -78,7 +67,7 @@ const TextToSpeech = () => {
     setSpeakCount(0);
     return "";
   }
-
+  
   useEffect(() => {
     fetching(prompt);
   }, [clicked]);
@@ -97,15 +86,15 @@ const TextToSpeech = () => {
             </View>
             <View>
               <TouchableHighlight 
-                className="p-4 w-fit rounded-lg bg-grey dark:bg-black items-center" 
+                className="p-4 w-fit rounded-lg bg-iguide-main-brand dark:bg-black items-center" 
                 onPress={() => {
                   setLoading(true);
                   setClicked(prev => !prev);
                   setSpeakCount(1);
                 }}
-                underlayColor="white">
+                underlayColor="grey">
                 <View>
-                  <Text>Generate</Text>
+                  <Text className='text-xl text-[white]'>Generate</Text>
                 </View>
               </TouchableHighlight>
             </View>

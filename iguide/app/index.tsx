@@ -15,6 +15,7 @@ export default function Index() {
           <GestureHandlerRootView>
             <ScrollView>
               <UserTxtInput />
+              <AudioRecording />
             </ScrollView>
           </GestureHandlerRootView>
         </View>
