@@ -49,29 +49,6 @@ const AudioRecording = () => {
     audioRecorder.uri ? uploadAudio(await audioRecorder.uri) : console.log("There was an error stopping the recording.")
   }
 
-  // const uploadAudio = async (uri: string) => {
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'});
-  //     //look into this more closely, specifcally: why we can just send the entire local uri to the server and not a blob!
-  //     formData.append('prompt', "There was no prompt passed to the model!");
-  //     //formData.append('audio', blob, 'audio-file.mp4');
-  
-  //     const response = await fetch('http://localhost:3060/recieveaudio', {
-  //       method: 'POST',
-  //       body: formData
-  //     });
-  
-  //     if (response.ok) {
-  //       console.log('File uploaded successfully');
-  //     } else {
-  //       console.error('File upload failed:', response.statusText);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error reading file or uploading:', error);
-  //   }
-  // };
-
   const uploadAudio = (uri: string) => {
     //have to fix a couple things here like what the response is on the server side.
     const formData = new FormData();
