@@ -1,11 +1,13 @@
 import { useState, useEffect} from 'react';
-import { View, StyleSheet, Button } from 'react-native';
-import { useAudioRecorder, RecordingOptions, AudioModule, RecordingPresets } from 'expo-audio';
+import { View, StyleSheet, Button, Platform } from 'react-native';
+import { useAudioRecorder, RecordingOptions, AudioModule, RecordingPresets, IOSOutputFormat, AudioQuality } from 'expo-audio';
 import {
   TouchableHighlight,
   Text
 } from 'react-native';
-
+import * as FileSystem from 'expo-file-system';
+import { Buffer } from 'buffer';
+import { get } from 'http';
 
 /*
 
@@ -18,11 +20,22 @@ with the
   audio: "this is the spoken prompt which will have to be converted in the server."
 }
 
+
+URI -> base64 -> blob -> send to the server by appending to the form.
+There is currently an issue with recording where the first instance of recording doesn't get loaded but start and stop work.
+This could be due to 
+- async nature of the recording
+- state handling
+
+Another issue that has risen is that on the server the 
+file is only appearing in the request.form object and not in the request.files object.
+This means that the file is not being sent as a file but as a form object.
+
 */
 
+
 const AudioRecording = () => {
-  const [recording, setRecording] = useState(false); // preserve the states for each rerender
-  const [audioUri, setAudioUri] = useState(""); // preserve the uri
+  const [recording, setRecording] = useState(false); // preserve the states for each rerender when interacting
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
   const record = () => {
@@ -32,51 +45,48 @@ const AudioRecording = () => {
 
   const stopRecording = async () => {
     await audioRecorder.stop();
-    setRecording(audioRecorder.isRecording);
-    if(typeof audioRecorder.uri === "string"){
-      setAudioUri(audioRecorder.uri);
-      uploadAudio(audioUri);
-    }
-    else{
-      console.log("There was an error stopping the recording.")
-    }
+    setRecording(await audioRecorder.isRecording);
+    audioRecorder.uri ? uploadAudio(await audioRecorder.uri) : console.log("There was an error stopping the recording.")
   }
 
-  //the plan is to get the audio uri and 
+  // const uploadAudio = async (uri: string) => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'});
+  //     //look into this more closely, specifcally: why we can just send the entire local uri to the server and not a blob!
+  //     formData.append('prompt', "There was no prompt passed to the model!");
+  //     //formData.append('audio', blob, 'audio-file.mp4');
+  
+  //     const response = await fetch('http://localhost:3060/recieveaudio', {
+  //       method: 'POST',
+  //       body: formData
+  //     });
+  
+  //     if (response.ok) {
+  //       console.log('File uploaded successfully');
+  //     } else {
+  //       console.error('File upload failed:', response.statusText);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error reading file or uploading:', error);
+  //   }
+  // };
+
   const uploadAudio = (uri: string) => {
+    //have to fix a couple things here like what the response is on the server side.
     const formData = new FormData();
-    //keep working here to get the Blob (binary large object) of the audio file from the URI!
-    fetch(uri)
-        .then(response => response.blob())
-        .then(blob => {
-          // Read the Blob as a data URL
-          const reader = new FileReader();
-          reader.readAsDataURL(blob); 
-      
-          reader.onloadend = () => {
-            // Send the data URL in the fetch request
-            const base64Audio = reader.result.split(',')[1]; // Extract Base64 data
-            formData.append('audio', base64Audio);
-            fetch('http://localhost:3060/recieveaudio', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              },
-              body: formData,
-              mode: 'cors'
-            })
-            .then(response => response.json()) 
-            .then(data => {
-              // Handle response
-              console.log(data);
-            })
-            .catch(error => {
-              // Handle error
-              console.error(error);
-            });
-          }
-        })}
-  };
+    formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'});
+    //look into this more closely, specifcally: why we can just send the entire local uri to the server and not a blob!
+    formData.append('prompt', "There was no prompt passed to the model!");
+    //formData.append('audio', blob, 'audio-file.mp4');
+
+    fetch('http://localhost:3060/recieveaudio', {
+      method: 'POST',
+      body: formData
+    })
+      .then(res => console.log(res))
+      .catch(err => console.error(err));
+  }
 
   //look into canAskAgain as well from https://docs.expo.dev/versions/latest/sdk/audio/
   useEffect(() => {

@@ -33,12 +33,12 @@ const TextToSpeech = () => {
   const [speakCount, setSpeakCount] = useState(0);
   //below is for recording audio with ExpoAudio module
 
-  const fetching = (userPrompt: String) => {
+  const fetching = (userPrompt: string) => {
     const formData = new FormData();
     const blob = new Blob([''], {type: 'image/jpg'}); 
     //images come in as blobs so we have to work on it here!
     //we should check if any of the data is null or not available here.
-    formData.append('prompt', String(userPrompt));
+    formData.append('prompt', userPrompt);
     formData.append('image', blob, 'image.jpg');
     fetch('http://localhost:3060/recievepayload', //this endpoint should be in a config or .env file
       {

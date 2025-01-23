@@ -24,7 +24,6 @@
   },
   "submit": {
     "production": {}
-  },
-  "comment": "Build configuration for the development client in the iOS simulator if you want to run do the command: eas build --platform ios --profile development-simulator"
+  }
 }
 
