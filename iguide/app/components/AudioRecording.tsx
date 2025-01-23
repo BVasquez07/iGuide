@@ -1,13 +1,10 @@
 import { useState, useEffect} from 'react';
 import { View, StyleSheet, Button, Platform } from 'react-native';
-import { useAudioRecorder, RecordingOptions, AudioModule, RecordingPresets, IOSOutputFormat, AudioQuality } from 'expo-audio';
+import { useAudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
 import {
   TouchableHighlight,
   Text
 } from 'react-native';
-import * as FileSystem from 'expo-file-system';
-import { Buffer } from 'buffer';
-import { get } from 'http';
 
 /*
 
@@ -55,7 +52,6 @@ const AudioRecording = () => {
     formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'});
     //look into this more closely, specifcally: why we can just send the entire local uri to the server and not a blob!
     formData.append('prompt', "There was no prompt passed to the model!");
-    //formData.append('audio', blob, 'audio-file.mp4');
 
     fetch('http://localhost:3060/recieveaudio', {
       method: 'POST',
