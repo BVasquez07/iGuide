@@ -17,7 +17,39 @@ import * as Speech from 'expo-speech';
 import * as ImagePicker from 'expo-image-picker';
 import { useAudioPlayer } from 'expo-audio';
 import colors from 'tailwindcss/colors';
+import { Asset } from 'expo-asset';
+const greetingFiles = [
+  require("../../assets/audio/gptRes0.wav"),
+  require("../../assets/audio/gptRes1.wav"),
+  require("../../assets/audio/gptRes2.wav"),
+  require("../../assets/audio/gptRes3.wav"),
+  require("../../assets/audio/gptRes4.wav"),
+  require("../../assets/audio/gptRes5.wav"),
+  require("../../assets/audio/gptRes6.wav"),
+  require("../../assets/audio/gptRes7.wav"),
+  require("../../assets/audio/gptRes8.wav"),
+  require("../../assets/audio/gptRes9.wav"),
+  require("../../assets/audio/gptRes10.wav"),
+  require("../../assets/audio/gptRes11.wav"),
+  require("../../assets/audio/gptRes12.wav"),
+  require("../../assets/audio/gptRes13.wav"),
+  require("../../assets/audio/gptRes14.wav"),
+  require("../../assets/audio/gptRes15.wav"),
+  require("../../assets/audio/gptRes16.wav"),
+  require("../../assets/audio/gptRes17.wav"),
+  require("../../assets/audio/gptRes18.wav"),
+  require("../../assets/audio/gptRes19.wav"),
+  require("../../assets/audio/gptRes20.wav"),
+  require("../../assets/audio/gptRes21.wav"),
+  require("../../assets/audio/gptRes22.wav"),
+  require("../../assets/audio/gptRes23.wav"),
+  require("../../assets/audio/gptRes24.wav"),
+  require("../../assets/audio/gptRes25.wav"),
+  require("../../assets/audio/gptRes26.wav"),
+  require("../../assets/audio/gptRes27.wav"),
+]
 
+const audioSource = greetingFiles[Math.floor(Math.random() * greetingFiles.length)];
 // for understanding how to pick image from the library the image 
 // we can use the following: https://docs.expo.dev/tutorial/image-picker/
 //here we will need a default audio for the default prompt of errors and such.
@@ -58,8 +90,8 @@ const TextToSpeech = () => {
       })
       .catch((err) => {
         setLoading(false);
-        setFetchedData("There was an error with your request please try later");
-        return err;
+        console.log(err);
+        return setFetchedData("There was an error with your request please try later");
       });
   }
   const vocalize = (textToSay: string) : string => { // this is the built in speak service that expo has!
@@ -71,6 +103,10 @@ const TextToSpeech = () => {
   useEffect(() => {
     fetching(prompt);
   }, [clicked]);
+
+  const player = useAudioPlayer(audioSource);
+  player.volume = 0.60;
+  player.play();
 
   return (
     <View>
