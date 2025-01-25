@@ -1,10 +1,11 @@
 import { useState, useEffect} from 'react';
 import { View, StyleSheet, Button, Platform } from 'react-native';
-import { useAudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
+import { useAudioRecorder, useAudioPlayer, AudioModule, RecordingPresets } from 'expo-audio';
 import {
   TouchableHighlight,
   Text
 } from 'react-native';
+import * as FileSystem from "expo-file-system";
 
 /*
 
@@ -16,24 +17,13 @@ with the
   prompt: "the prompt"
   audio: "this is the spoken prompt which will have to be converted in the server."
 }
-
-
-URI -> base64 -> blob -> send to the server by appending to the form.
-There is currently an issue with recording where the first instance of recording doesn't get loaded but start and stop work.
-This could be due to 
-- async nature of the recording
-- state handling
-
-Another issue that has risen is that on the server the 
-file is only appearing in the request.form object and not in the request.files object.
-This means that the file is not being sent as a file but as a form object.
-
 */
-
 
 const AudioRecording = () => {
   const [recording, setRecording] = useState(false); // preserve the states for each rerender when interacting
+  const [audioData, setAudioData] = useState(null);
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+
 
   const record = () => {
     audioRecorder.record();
@@ -46,6 +36,37 @@ const AudioRecording = () => {
     audioRecorder.uri ? uploadAudio(await audioRecorder.uri) : console.log("There was an error stopping the recording.")
   }
 
+  const blobToURI = async (blob: Blob) => { //review this chunk here
+
+    // the idea here is that we take in our blob -> base64 -> uri
+    try {
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onloadend = async () => {
+          const base64Data = reader.result.split(",")[1]; // Extract the Base64 part
+          const filePath = `${FileSystem.cacheDirectory}temp-audio-file.mp3`;
+
+          try {
+            await FileSystem.writeAsStringAsync(filePath, base64Data, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
+            resolve(filePath);
+          } catch (error) {
+            reject("Error saving file: " + error.message);
+          }
+        };
+  
+        reader.onerror = () => {
+          reject("Error reading Blob");
+        };
+  
+        reader.readAsDataURL(blob); // Convert Blob to Base64
+      });
+    } catch (error) {
+      console.error("Error converting Blob to URI:", error);
+    }
+  };
+
   const uploadAudio = (uri: string) => {
     //have to fix a couple things here like what the response is on the server side.
     const formData = new FormData();
@@ -57,9 +78,15 @@ const AudioRecording = () => {
       method: 'POST',
       body: formData
     })
-      .then(res => console.log(res))
+      .then(res => res.blob())
+      .then(blob => blobToURI(blob))
+      .then(uri => setAudioData(uri))
       .catch(err => console.error(err));
+      //in the response we will be recieving a wav file in response which we will play
   }
+  
+  const player = useAudioPlayer(audioData);
+  player.play();
 
   //look into canAskAgain as well from https://docs.expo.dev/versions/latest/sdk/audio/
   useEffect(() => {

@@ -16,8 +16,6 @@ import {
 import * as Speech from 'expo-speech';
 import * as ImagePicker from 'expo-image-picker';
 import { useAudioPlayer } from 'expo-audio';
-import colors from 'tailwindcss/colors';
-import { Asset } from 'expo-asset';
 const greetingFiles = [
   require("../../assets/audio/gptRes0.wav"),
   require("../../assets/audio/gptRes1.wav"),
