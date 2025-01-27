@@ -19,6 +19,8 @@ with the
 }
 */
 
+//ALOT OF WORK TO BE DONE IN THIS FILE and with the component tree. 
+
 const AudioRecording = () => {
   const [recording, setRecording] = useState(false); // preserve the states for each rerender when interacting
   const [audioData, setAudioData] = useState(null);
@@ -37,7 +39,6 @@ const AudioRecording = () => {
   }
 
   const blobToURI = async (blob: Blob) => { //review this chunk here
-
     // the idea here is that we take in our blob -> base64 -> uri
     try {
       const reader = new FileReader();
@@ -60,7 +61,7 @@ const AudioRecording = () => {
           reject("Error reading Blob");
         };
   
-        reader.readAsDataURL(blob); // Convert Blob to Base64
+        reader.readAsDataURL(blob);
       });
     } catch (error) {
       console.error("Error converting Blob to URI:", error);
