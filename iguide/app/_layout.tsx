@@ -1,8 +1,9 @@
-import { Stack, Slot } from "expo-router";
-import "../global.css";
+import { Stack } from "expo-router";
 
-
-
-export default function RootLayout() {
-  return <Stack />;
+export default function Layout() {
+  return (
+      <Stack>
+        <Stack.Screen name="guide" options={{ title: "Capture & Speak" }} />
+      </Stack>
+  );
 }
