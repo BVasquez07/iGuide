@@ -15,7 +15,8 @@ import {
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as ImagePicker from 'expo-image-picker';
-import { useAudioPlayer } from 'expo-audio';
+// import { useAudioPlayer } from 'expo-audio';
+import { Audio } from 'expo-av';
 const greetingFiles = [
   require("../../assets/audio/gptRes0.wav"),
   require("../../assets/audio/gptRes1.wav"),
@@ -64,13 +65,18 @@ const TextToSpeech = () => {
   //below is for recording audio with ExpoAudio module
 
   const fetching = (userPrompt: string) => {
+    if(userPrompt === "") {
+      console.log("there is a rendering issue")
+      return;
+    }
     const formData = new FormData();
     const blob = new Blob([''], {type: 'image/jpg'}); 
     //images come in as blobs so we have to work on it here!
     //we should check if any of the data is null or not available here.
-    formData.append('prompt', userPrompt);
+    formData.append('text', userPrompt);
     formData.append('image', blob, 'image.jpg');
-    fetch('http://localhost:3060/recievepayload', //this endpoint should be in a config or .env file
+    // change back here for localhost testing
+    fetch('http://3.145.65.151/incomingPayload', //this endpoint should be in a config or .env file
       {
         method: 'POST',
         headers: {
@@ -102,9 +108,9 @@ const TextToSpeech = () => {
     fetching(prompt);
   }, [clicked]);
 
-  const player = useAudioPlayer(audioSource);
-  player.volume = 0.60;
-  player.play();
+  // const player = useAudioPlayer(audioSource);
+  // player.volume = 0.60;
+  // player.play();
 
   return (
     <View>
@@ -114,7 +120,7 @@ const TextToSpeech = () => {
           <View>
             <View className='m-2 w-[250px]'>
               <TextInput 
-                multiline 
+                multiline
                 placeholder="Input your prompt" 
                 onChangeText={text => setPrompt(text)}/>
             </View>

@@ -1,11 +1,12 @@
 import { useState, useEffect} from 'react';
-import { View, StyleSheet, Button, Platform } from 'react-native';
-import { useAudioRecorder, useAudioPlayer, AudioModule, RecordingPresets } from 'expo-audio';
+import { View } from 'react-native';
+// import { useAudioRecorder, useAudioPlayer, AudioModule, RecordingPresets } from 'expo-audio'; uncomment to get working!!!
 import {
   TouchableHighlight,
   Text
 } from 'react-native';
 import * as FileSystem from "expo-file-system";
+//THIS CODE IS STILL USEFUL IT JUST USES AN ALPHA VERSION OF THE AUDIO API WHICH IS NOT AVAILABLE ON EXPO GO
 
 /*
 
@@ -14,7 +15,7 @@ with the
 
 {
   image: image.jpg,
-  prompt: "the prompt"
+  text: "the prompt"
   audio: "this is the spoken prompt which will have to be converted in the server."
 }
 */
@@ -73,9 +74,11 @@ const AudioRecording = () => {
     const formData = new FormData();
     formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'});
     //look into this more closely, specifcally: why we can just send the entire local uri to the server and not a blob!
-    formData.append('prompt', "There was no prompt passed to the model!");
+    formData.append("text", "I love life!");
+    //formData.append("image", {uri: "iguide/assets/images/adaptive-icon.png", type: 'image/png', name: 'test.png'});
 
-    fetch('http://localhost:3060/recieveaudio', {
+    fetch('http://127.0.0.1:3060/incomingPayload', {
+      mode: 'cors',
       method: 'POST',
       body: formData
     })
@@ -98,6 +101,8 @@ const AudioRecording = () => {
       }
     })();
   }, []);
+
+
   return (
     <View>
       <TouchableHighlight 
@@ -109,7 +114,6 @@ const AudioRecording = () => {
         </View>
       </TouchableHighlight>
     </View>
-    
   );
 }
 
