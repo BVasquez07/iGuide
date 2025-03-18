@@ -7,7 +7,7 @@ import {
     Text
   } from 'react-native';
 import * as FileSystem from "expo-file-system";
-
+const url = 'http://3.145.65.151:5000/'; //api url whether it be local or deployed.
 
 //helper function
 const blobToURI = async (blob: Blob) => { //review this chunk here
@@ -86,7 +86,7 @@ const AudioRecording_AV = () => {
         formData.append("text", "I love life!");
         //formData.append("image", {uri: "iguide/assets/images/adaptive-icon.png", type: 'image/png', name: 'test.png'});
 
-        fetch('http://3.145.65.151:5000/incomingPayload', {
+        fetch(`${url}incomingPayload`, {
             mode: 'cors',
             method: 'POST',
             body: formData
