@@ -1,6 +1,7 @@
 import { Text, View } from "react-native";
 import UserTxtInput from "./components/TextToSpeech";
-import AudioRecording from "./components/AudioRecording";
+// import AudioRecording from "./components/AudioRecording";
+import AudioRecording_AV from "./components/AudioRecording_AV";
 import {GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 
 
@@ -14,8 +15,9 @@ export default function Index() {
         <View >
           <GestureHandlerRootView>
             <ScrollView>
-              <UserTxtInput />
-              <AudioRecording />
+              {/* <UserTxtInput /> */}
+              <AudioRecording_AV />
+              {/* <AudioRecording /> */}
             </ScrollView>
           </GestureHandlerRootView>
         </View>

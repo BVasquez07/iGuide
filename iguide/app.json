@@ -10,7 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.brandon0907.iguide"
+      "bundleIdentifier": "com.brandon0907.iguide",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +41,7 @@
         }
       ],
       [
-        "expo-audio",
+        "expo-av",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
         }
