@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useAppContext } from "../context/AppContext";
+import { useAppContext } from "@/context/AppContext";
 
 export default function CaptureScreen(): JSX.Element {
     const { setImageUri } = useAppContext();

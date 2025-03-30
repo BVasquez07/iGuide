@@ -1,55 +1,120 @@
-import React, { useEffect } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableHighlight } from "react-native";
 import { useAppContext } from "../context/AppContext";
-import * as Speech from "expo-speech";
+import { Audio } from 'expo-av';
+import { AVPlaybackSourceObject } from 'expo-av/build/AV';
+import * as FileSystem from "expo-file-system";
+// const url = 'http://3.145.65.151:5000/'; //api url whether it be local or deployed.
+const url = "http://localhost:3060/"
+//helper function
+const blobToURI = async (blob: Blob) => { 
+    // the idea here is that we take in our blob -> base64 -> uri
+    try {
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+        reader.onloadend = async () => {
+        const base64Data = reader.result.split(",")[1]; // Extract the Base64 part
+        const filePath = `${FileSystem.cacheDirectory}temp-audio-file.mp3`;
+
+        try {
+            await FileSystem.writeAsStringAsync(filePath, base64Data, {
+            encoding: FileSystem.EncodingType.Base64,
+            });
+            resolve(filePath);
+        } catch (error) {
+            reject("Error saving file: " + error.message);
+        }
+        };
+
+        reader.onerror = () => {
+        reject("Error reading Blob");
+        };
+
+        reader.readAsDataURL(blob);
+    });
+    } catch (error) {
+    console.error("Error converting Blob to URI:", error);
+    }
+};
+
 
 export default function ResultScreen(): JSX.Element {
-    const { imageUri, text } = useAppContext();
+    const { imageUri, text, audioUri} = useAppContext();
+    const cachedImage = imageUri
+    const cachedText = text;
+    const [sound, setSound] = useState();
+    const [incomingAudio, setIncomingAudio] = useState();
 
-    // Hardcoded image and text (Optional)
-    // const hardcodedImage = require("../assets/images/pic.png"); // Replace with local or online image
-    const hardcodedText = "The image shows a small ketchup packet from Dave's Hot Chicken, a popular fast-food chain known for its spicy fried chicken.\n" +
-        "\n" +
-        "Details of the Ketchup Packet:\n" +
-        "Branding: The packet prominently features the Dave's Hot Chicken logo, which includes a cartoon chicken with a surprised expression and a red comb.\n" +
-        "Product: It is labeled as \"Tomato Ketchup.\"\n" +
-        "Ingredients (partially visible): The packet lists standard ketchup ingredients, including:\n" +
-        "Tomato concentrate from ripe tomatoes\n" +
-        "High fructose corn syrup\n" +
-        "Distilled vinegar\n" +
-        "Corn syrup\n" +
-        "Less than 2% of spice, onion powder, and natural flavors\n" +
-        "Manufacturing Location: It mentions Hollywood, CA, which is where Dave's Hot Chicken was originally founded.\n" +
-        "Condition: The packet appears slightly crumpled but unopened.";
-
-    // Use appContext text if available, otherwise use hardcoded text
-    const displayText = hardcodedText;
-    const displayImage = null;
+    useEffect(() => { //unload the sound to avoid memory leaks
+        return sound
+        ? () => {
+            console.log('Unloading Sound');
+            sound.unloadAsync(); 
+            }
+        : undefined;
+    }, [sound]);
 
     useEffect(() => {
-        // Speak the text when the screen loads
-        Speech.speak(displayText, { language: "en" });
-    }, [displayText]);
+        uploadAudio(audioUri)
+    }, [])
 
-    const handleReplayTTS = () => {
-        Speech.speak(displayText, { language: "en" });
+    const playRecording = async (uri: string) => {
+        //playing back the sound
+        console.log('Loading Sound');
+
+        //params to pass to the sound object to play
+        const source: AVPlaybackSourceObject = {uri: uri}
+        const downloadFirst = false;
+        const initialStatus = {shouldPlay: true};
+        const onPlaybackStatusUpdate = null
+
+        const sound = new Audio.Sound();
+        sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+
+        await sound.loadAsync(source, initialStatus, downloadFirst);
+        setSound(sound); 
+
+        console.log('Playing Sound');
+        await sound.playAsync(); 
     };
+
+    const uploadAudio = (uri: string) => {
+        //have to fix a couple things here like what the response is on the server side.
+        const formData = new FormData();
+        formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'});
+        //look into this more closely, specifcally: why we can just send the entire local uri to the server and not a blob!
+        formData.append("text", text);
+        formData.append("image", {uri: cachedImage, type: 'image/jpeg', name: 'test.png'});
+
+        fetch(`${url}incomingPayload`, {
+            mode: 'cors',
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.blob())
+            .then(blob => blobToURI(blob)) // turn the audio file 
+            .then(uri => playRecording(uri)) // we can store the response URI so that playback can occur
+            .catch(err => console.error(err));
+        //in the response we will be recieving a wav file in response which we will play
+    };
+
+    const playBack = () => {
+        incomingAudio ? playRecording(incomingAudio) : console.log("No audio to play back");
+    }
+    
 
     return (
         <View style={styles.container}>
-            {/* Top Left Eye Icon */}
             <Image source={require("../assets/images/eye-icon.png")} style={styles.logo} />
 
             <Text style={styles.title}>More about this visage...</Text>
 
-            {/* Display Captured or Hardcoded Image */}
-            <Image source={displayImage} style={styles.image} alt="image goes here" />
+            <Image source={{uri: cachedImage}} style={styles.image} alt="cached image" />
 
-            {/* Display Transcribed or Hardcoded Text */}
-            <Text style={styles.text}>{displayText}</Text>
+            <Text style={styles.text}>{cachedText}</Text>
 
             {/* Play TTS Button */}
-            <TouchableOpacity onPress={handleReplayTTS} style={styles.ttsButton}>
+            <TouchableOpacity onPress={playBack} style={styles.ttsButton}>
                 <Text style={styles.ttsButtonText}>🔊 Listen</Text>
             </TouchableOpacity>
         </View>
