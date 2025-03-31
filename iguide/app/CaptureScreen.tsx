@@ -9,45 +9,49 @@ export default function CaptureScreen(): JSX.Element {
     const [image, setImage] = useState<string | null>(null);
     const router = useRouter();
 
-    useEffect(() => {
-        // Automatically open the camera when the screen loads
-        openCamera();
-    }, []);
+    // useEffect(() => {
+    //     // Automatically open the camera when the screen loads
+    //     openCamera();
+    // }, []);
 
     // Open Camera to Take a Picture
     const openCamera = async () => {
-        const permission = await ImagePicker.requestCameraPermissionsAsync();
-        if (!permission.granted) {
-            alert("Camera access is required to take pictures.");
-            return;
-        }
+        // const permission = await ImagePicker.requestCameraPermissionsAsync();
+        // if (!permission.granted) {
+        //     alert("Camera access is required to take pictures.");
+        //     return;
+        // }
 
         const result = await ImagePicker.launchCameraAsync({
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
+            quality: 0.3, // we need a lower quality so the compression is low as the server can't handle large files.
         });
 
         if (!result.canceled) {
+            console.log(result.assets[0].uri);
             handleImageSelection(result.assets[0].uri);
         }
     };
 
     // Open Image Library to Select a Photo
     const openImageLibrary = async () => {
-        const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (!permission.granted) {
-            alert("Permission to access photos is required.");
-            return;
-        }
+
+        // const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        // if (!permission.granted) {
+        //     alert("Permission to access photos is required.");
+        //     return;
+        // }
+        //the permission check is causing issues on the simulator.
 
         const result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
+            quality: 0.3,
         });
 
         if (!result.canceled) {
+            console.log(result.assets[0].uri);
             handleImageSelection(result.assets[0].uri);
         }
     };

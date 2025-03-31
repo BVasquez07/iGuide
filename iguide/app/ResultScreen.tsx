@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, TouchableHighlight } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useAppContext } from "../context/AppContext";
 import { Audio } from 'expo-av';
 import { AVPlaybackSourceObject } from 'expo-av/build/AV';
 import * as FileSystem from "expo-file-system";
-// const url = 'http://3.145.65.151:5000/'; //api url whether it be local or deployed.
-const url = "http://localhost:3060/"
+const url = 'http://3.145.65.151:5000/'; //api url whether it be local or deployed.
+
 //helper function
 const blobToURI = async (blob: Blob) => { 
     // the idea here is that we take in our blob -> base64 -> uri
@@ -40,10 +40,9 @@ const blobToURI = async (blob: Blob) => {
 
 export default function ResultScreen(): JSX.Element {
     const { imageUri, text, audioUri} = useAppContext();
-    const cachedImage = imageUri
-    const cachedText = text;
     const [sound, setSound] = useState();
     const [incomingAudio, setIncomingAudio] = useState();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => { //unload the sound to avoid memory leaks
         return sound
@@ -55,6 +54,7 @@ export default function ResultScreen(): JSX.Element {
     }, [sound]);
 
     useEffect(() => {
+        setLoading(true);
         uploadAudio(audioUri)
     }, [])
 
@@ -76,15 +76,16 @@ export default function ResultScreen(): JSX.Element {
 
         console.log('Playing Sound');
         await sound.playAsync(); 
+        setLoading(false);
     };
 
     const uploadAudio = (uri: string) => {
         //have to fix a couple things here like what the response is on the server side.
         const formData = new FormData();
-        formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'});
-        //look into this more closely, specifcally: why we can just send the entire local uri to the server and not a blob!
-        formData.append("text", text);
-        formData.append("image", {uri: cachedImage, type: 'image/jpeg', name: 'test.png'});
+
+        audioUri ?  formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'}): null;
+        text ? formData.append("text", text): null;
+        imageUri ? formData.append("image", {uri: imageUri, type: 'image/jpeg', name: 'image.jpg'}): null;
 
         fetch(`${url}incomingPayload`, {
             mode: 'cors',
@@ -93,7 +94,10 @@ export default function ResultScreen(): JSX.Element {
         })
             .then(res => res.blob())
             .then(blob => blobToURI(blob)) // turn the audio file 
-            .then(uri => playRecording(uri)) // we can store the response URI so that playback can occur
+            .then(uri => {
+                setIncomingAudio(uri);
+                playRecording(uri);
+            }) // we can store the response URI so that playback can occur
             .catch(err => console.error(err));
         //in the response we will be recieving a wav file in response which we will play
     };
@@ -109,14 +113,18 @@ export default function ResultScreen(): JSX.Element {
 
             <Text style={styles.title}>More about this visage...</Text>
 
-            <Image source={{uri: cachedImage}} style={styles.image} alt="cached image" />
+            <Image source={{uri: imageUri}} style={styles.image} alt="cached image" />
 
-            <Text style={styles.text}>{cachedText}</Text>
-
-            {/* Play TTS Button */}
-            <TouchableOpacity onPress={playBack} style={styles.ttsButton}>
-                <Text style={styles.ttsButtonText}>🔊 Listen</Text>
-            </TouchableOpacity>
+            {loading?
+                <ActivityIndicator size="large" color="#70CDFF" />
+                :
+                <>
+                    <Text style={styles.text}>{text}</Text>
+                    <TouchableOpacity onPress={playBack} style={styles.ttsButton}>
+                        <Text style={styles.ttsButtonText}>Replay</Text>
+                    </TouchableOpacity>
+                </>
+            }
         </View>
     );
 }
