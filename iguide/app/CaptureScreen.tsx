@@ -23,9 +23,9 @@ export default function CaptureScreen(): JSX.Element {
         //     return;
         // }
         const result = await ImagePicker.launchCameraAsync({
-            allowsEditing: FileSystemWritableFileStream,
+            allowsEditing: false,
             aspect: [4, 3],
-            quality: 0.3, // we need a lower quality so the compression is low as the server can't handle large files.
+            quality: 0.1, // we need a lower quality so the compression is low as the server can't handle large files.
         });
 
         if (!result.canceled) {
@@ -47,7 +47,7 @@ export default function CaptureScreen(): JSX.Element {
         const result = await ImagePicker.launchImageLibraryAsync({
             allowsEditing: false,
             aspect: [4, 3],
-            quality: 0.3,
+            quality: 0.1,
         });
 
         if (!result.canceled) {

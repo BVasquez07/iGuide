@@ -16,14 +16,6 @@ export default function HomeScreen(): JSX.Element {
         }
     };
 
-    const handleGoBack = () => {
-        if (inputText.trim()) {
-            setText(inputText);
-            Keyboard.dismiss();
-            router.push("/CaptureScreen"); // Opens camera screen immediately
-        }
-    };
-
     
 
     return (
