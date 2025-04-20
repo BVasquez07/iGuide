@@ -82,7 +82,9 @@ export default function ResultScreen(): JSX.Element {
     const uploadAudio = (uri: string) => {
         //have to fix a couple things here like what the response is on the server side.
         const formData = new FormData();
-
+        console.log(audioUri ? "not empty" : "empty");
+        console.log(text ? "not empty" : "empty");
+        console.log(imageUri ? "not empty" : "empty");
         audioUri ?  formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'}): null;
         text ? formData.append("text", text): null;
         imageUri ? formData.append("image", {uri: imageUri, type: 'image/jpeg', name: 'image.jpg'}): null;
@@ -132,9 +134,9 @@ export default function ResultScreen(): JSX.Element {
 const styles = StyleSheet.create({
     container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 20, backgroundColor: "#FFFFFF" },
     logo: { position: "absolute", top: 40, left: 20, width: 40, height: 40, resizeMode: "contain" },
-    title: { fontSize: 22, fontWeight: "500", marginBottom: 20, color: "#000" },
+    title: { fontFamily:"inter",fontSize: 22, fontWeight: "500", marginBottom: 20, color: "#000" },
     image: { width: "90%", height: 200, borderRadius: 10, marginBottom: 20 },
-    text: { fontSize: 16, textAlign: "center", color: "#000", marginBottom: 20 },
+    text: { fontFamily:"inter", fontSize: 16, textAlign: "center", color: "#000", marginBottom: 20 },
     ttsButton: { backgroundColor: "#007bff", padding: 10, borderRadius: 10, marginTop: 10 },
     ttsButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });

@@ -122,7 +122,8 @@ export default function RecordScreen(): JSX.Element {
             {/* Top Left Eye Icon */}
             <Image source={require("../assets/images/eye-icon.png")} style={styles.logo} />
 
-            {/* Animated GIF when recording */}
+            {/* This conditional rendering is horrible for thestack since nothing will get rendered when we pop/go back from the screen at the top of the stack*/}
+
             {isRecording && (
                 <Image source={require("../assets/images/sound.gif")} style={styles.waveform} />
             )}
