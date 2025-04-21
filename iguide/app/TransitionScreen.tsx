@@ -1,0 +1,1 @@
+// this screen will basically just be used to send the data to the component

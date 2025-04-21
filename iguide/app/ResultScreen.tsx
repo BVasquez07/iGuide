@@ -129,10 +129,10 @@ export default function ResultScreen(): JSX.Element {
                 :
                 <>
                     <Text style={styles.text}>{text}</Text>
-                    <TouchableOpacity onPress={playBack} style={styles.ttsButton}>
+                    <TouchableOpacity onPress={playBack} style={styles.button}>
                         <Text style={styles.ttsButtonText}>Replay</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleRestart} style={styles.ttsButton}>
+                    <TouchableOpacity onPress={handleRestart} style={styles.button}>
                         <Text style={styles.ttsButtonText}>Something New</Text>
                     </TouchableOpacity>
                 </>
@@ -147,6 +147,6 @@ const styles = StyleSheet.create({
     title: { fontFamily:"inter",fontSize: 22, fontWeight: "500", marginBottom: 20, color: "#000" },
     image: { width: "90%", height: 200, borderRadius: 10, marginBottom: 20 },
     text: { fontFamily:"inter", fontSize: 16, textAlign: "center", color: "#000", marginBottom: 20 },
-    ttsButton: { backgroundColor: "#007bff", padding: 10, borderRadius: 10, marginTop: 10 },
-    ttsButtonText: { color: "#fff", fontSize: 16, fontFamily:"inter" },
+    ttsButtonText: { color: "#87CEFA", fontSize: 16, fontFamily:"inter" },
+    button: { borderColor: "#87CEFA", borderWidth: 2, padding: 15, borderRadius: 50, marginTop: 10, width: "80%", alignItems: "center" }
 });

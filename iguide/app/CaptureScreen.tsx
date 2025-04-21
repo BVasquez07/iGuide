@@ -10,11 +10,6 @@ export default function CaptureScreen(): JSX.Element {
     const [image, setImage] = useState<string | null>(null);
     const router = useRouter();
 
-    // useEffect(() => {
-    //     // Automatically open the camera when the screen loads
-    //     openCamera();
-    // }, []);
-
     // Open Camera to Take a Picture
     const openCamera = async () => {
         // const permission = await ImagePicker.requestCameraPermissionsAsync();
@@ -76,14 +71,17 @@ export default function CaptureScreen(): JSX.Element {
             {/* Display Selected Image */}
             {image && <Image source={{ uri: image }} style={styles.image} />}
 
-            {/* Camera Button */}
-            <TouchableOpacity onPress={openCamera} style={styles.button}>
-                <Text style={styles.buttonText}>Take Picture</Text>
-            </TouchableOpacity>
 
-            {/* Upload Button */}
-            <TouchableOpacity onPress={openImageLibrary} style={styles.button}>
-                <Text style={styles.buttonText}>Upload from Gallery</Text>
+
+            <TouchableOpacity onPress={() => router.push("/RecordScreen")} style={styles.capture}>
+                <TouchableOpacity onPress={openCamera} style={styles.imageContainer}>
+                    <Image source={require("../assets/images/camera.png")} style={styles.camera} alt="camera to capture item" />
+                    <Text style={styles.buttonText}>Capture</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={openImageLibrary} style={styles.imageContainer}>
+                    <Image source={require("../assets/images/upload.png")} style={styles.upload} alt="upload image from camera roll" />
+                    <Text style={styles.buttonText}>Upload</Text>
+                </TouchableOpacity>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={handleNoImage} style={styles.button}>
@@ -97,6 +95,10 @@ const styles = StyleSheet.create({
     container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20, backgroundColor: "#fff"},
     title: { fontFamily:"inter", fontSize: 20, marginBottom: 20 },
     button: { borderColor: "#87CEFA", borderWidth: 2, padding: 15, borderRadius: 50, marginTop: 10, width: "80%", alignItems: "center" },
-    buttonText: { color: "#87CEFA", fontSize: 16, fontFamily:"inter" },
+    buttonText: { color: "#87CEFA", fontSize: 20, fontFamily:"inter" },
+    capture: {  flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 45, marginBottom: 15}, // Optional: Align items vertically },
+    camera: { width: 110, height: 100 },
+    upload: { width: 100, height: 100 },
+    imageContainer: { margin: 14, alignItems: 'center' },
     image: { width: 300, height: 300, borderRadius: 10, marginBottom: 20 }
 });

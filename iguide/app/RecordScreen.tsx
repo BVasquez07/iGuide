@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, Image, StyleSheet, TouchableHighlight } f
 import { useRouter } from "expo-router";
 import { useAppContext } from "../context/AppContext";
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from "expo-av";
+import BackArrow from "./components/backArrow";
 
 
 
@@ -17,49 +18,10 @@ export default function RecordScreen(): JSX.Element {
     const [permissionResponse, requestPermission] = Audio.usePermissions();
     const [sound, setSound] = useState();
     const [incomingAudio, setIncomingAudio] = useState();
+    const [displayListening, setDisplayListening] = useState(false);
+    const [displayHoldPrompt, setDisplayHoldPrompt] = useState(true); //be default should be true so the user knows what to do.
 
-    useEffect(() => {
-        startRecording(); // Start recording automatically when the screen loads
-    }, []);
 
-    useEffect(() => { //unload the sound to avoid memory leaks
-        return sound
-          ? () => {
-              console.log('Unloading Sound');
-              sound.unloadAsync(); 
-            }
-          : undefined;
-      }, [sound]);
-
-    // const startRecording = async () => {
-    //     try {
-    //         const { status } = await Audio.requestPermissionsAsync();
-    //         if (status !== "granted") {
-    //             alert("Microphone permission is required to record audio!");
-    //             return;
-    //         }
-
-    //         // Fix: Correct audio mode settings
-    //         await Audio.setAudioModeAsync({
-    //             allowsRecordingIOS: true,
-    //             playsInSilentModeIOS: true,
-    //             staysActiveInBackground: false,
-    //             interruptionModeIOS: InterruptionModeIOS.DuckOthers, // Fixed import
-    //             shouldDuckAndroid: true,
-    //             interruptionModeAndroid: InterruptionModeAndroid.DuckOthers, // Fixed import
-    //         });
-
-    //         // Start Recording
-    //         const newRecording = new Audio.Recording();
-    //         await newRecording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-    //         await newRecording.startAsync();
-
-    //         setRecording(newRecording);
-    //         setIsRecording(true);
-    //     } catch (error) {
-    //         console.error("Recording error:", error);
-    //     }
-    // };
     async function startRecording() {
         try {
             const { status } = await Audio.requestPermissionsAsync();
@@ -71,6 +33,8 @@ export default function RecordScreen(): JSX.Element {
                     allowsRecordingIOS: true,
                     playsInSilentModeIOS: true, // look into what this is
                     shouldDuckAndroid: true,
+                    interruptionModeIOS: InterruptionModeIOS.DuckOthers, // Fixed import
+                    staysActiveInBackground: false,
                     interruptionModeAndroid: InterruptionModeAndroid.DuckOthers, // Fixed import
                 }); 
     
@@ -100,43 +64,27 @@ export default function RecordScreen(): JSX.Element {
         setIsRecording(false);
         router.push("/CaptureScreen");
     };
-
-    // const stopRecording = async () => {
-    //     if (recording) {
-    //         try {
-    //             await recording.stopAndUnloadAsync();
-    //             const uri = recording.getURI();
-    //             if (uri) {
-    //                 await cacheAudio(uri);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error stopping recording:", error);
-    //         }
-    //         setIsRecording(false);
-    //         router.push("/CaptureScreen"); // Navigate to Camera Screen after stopping
-    //     }
-    // };
+    const handlePressIn = () => {
+        setDisplayListening(true);
+        setDisplayHoldPrompt(false);
+        startRecording();
+    }
+    const handlePressOut = () => {
+        setDisplayHoldPrompt(true);
+        setDisplayListening(false);
+        stopRecording();
+    }
 
     return (
         <View style={styles.container}>
-            {/* Top Left Eye Icon */}
-            <Image source={require("../assets/images/eye-icon.png")} style={styles.logo} />
+            <BackArrow />
 
-            {/* This conditional rendering is horrible for thestack since nothing will get rendered when we pop/go back from the screen at the top of the stack*/}
-
-            {isRecording && (
-                <Image source={require("../assets/images/sound.gif")} style={styles.waveform} />
-            )}
-
-            {/* Listening text when recording */}
-            {isRecording && <Text style={styles.listeningText}>Listening...</Text>}
-
-            {/* Stop Recording Button */}
-            {isRecording && (
-                <TouchableOpacity onPress={stopRecording} style={styles.stopButton}>
-                    <Text style={styles.stopButtonText}>Stop</Text>
-                </TouchableOpacity>
-            )}
+            <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} accessibilityLabel="Record button">
+                <Image source={require("../assets/images/audioRecord.png")} style={styles.waveform} />
+            </TouchableOpacity>
+            
+            {displayHoldPrompt && <Text style={styles.listeningText}>Hold the button above to begin recording...</Text>}
+            {displayListening && <Text style={styles.listeningText}>Listening...</Text>}
         </View>
     );
 }
@@ -144,8 +92,8 @@ export default function RecordScreen(): JSX.Element {
 const styles = StyleSheet.create({
     container: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
     logo: { position: "absolute", top: 40, left: 20, width: 40, height: 40, resizeMode: "contain" },
-    waveform: { width: 120, height: 120, resizeMode: "contain" },
-    listeningText: { marginTop: 10, fontSize: 18, fontWeight: "500", color: "#000" },
+    waveform: { width: 220, height: 220, resizeMode: "contain" },
+    listeningText: { marginTop: 10, fontFamily:'inter', fontSize: 20, color: "#000" },
     stopButton: { marginTop: 20, backgroundColor: "#ff3b30", paddingVertical: 10, paddingHorizontal: 25, borderRadius: 20 },
     stopButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });
