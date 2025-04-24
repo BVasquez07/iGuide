@@ -43,14 +43,25 @@ export default function HomeScreen(): JSX.Element {
     const [inputText, setInputText] = useState("");
     const router = useRouter();
     const [sound, setSound] = useState<Audio.Sound | null>(null);
+    let transitionText; // this wll depend on whether we have text or voice input.
+    let nextScreen; 
 
     const handleTextSubmit = () => {
+        
         if (inputText.trim()) {
+            transitionText = "Prepare to snap a picture of the object!"; // this wll depend on whether we have text or voice input.
+            nextScreen = "/CaptureScreen"; 
             setText(inputText);
             Keyboard.dismiss();
-            router.push("/CaptureScreen");
+            router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`); // Navigate to TransitionScreen with the input text as a query parameter
         }
     };
+    
+    const handleVoiceSubmit = () => {
+        transitionText = "Prepare to record your voice!"; // this wll depend on whether we have text or voice input.
+        nextScreen = "/RecordScreen"; 
+        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`);
+    }
 
     useEffect(() => { //unload the sound to avoid memory leaks
             return sound ? () => {
@@ -118,8 +129,8 @@ export default function HomeScreen(): JSX.Element {
                 keyboardType="default"
             />
             {/* Record Button - Navigates Immediately to RecordScreen */}
-            <TouchableOpacity onPress={() => router.push("/RecordScreen")} style={styles.speechButton}>
-                <Image source={require("../assets/images/speechButton.png")} style={styles.speechIcon} accessibilityLabel="Begin recording" />
+            <TouchableOpacity onPress={handleVoiceSubmit} style={styles.speechButton}>
+                <Image source={require("../assets/images/speechButton.png")} style={styles.speechIcon} accessibilityLabel="Begin recording your voice" />
             </TouchableOpacity>
         </View>
     );
