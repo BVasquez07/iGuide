@@ -9,6 +9,8 @@ const BackArrow = () => {
 
     const handleGoBack = () => router.back();
 
+    console.log(router);
+
     return (
         <TouchableOpacity onPress={handleGoBack} style={styles.arrowIcon}>
             <Image source={require("../../assets/images/backArrow.png")} style={styles.arrowSize} />

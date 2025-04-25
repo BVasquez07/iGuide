@@ -14,7 +14,7 @@ const blobToURI = async (blob: Blob) => {
     const reader = new FileReader();
     return new Promise((resolve, reject) => {
         reader.onloadend = async () => {
-        const base64Data = reader.result.split(",")[1]; // Extract the Base64 part
+        const base64Data = reader.result.split(",")[1]; // extracts the base64 part of the data URL
         const filePath = `${FileSystem.cacheDirectory}temp-audio-file.mp3`;
 
         try {
@@ -39,7 +39,8 @@ const blobToURI = async (blob: Blob) => {
 };
 
 
-export default function ResultScreen(): JSX.Element {
+
+const ResultScreen = () : JSX.Element => {
     const { imageUri, text, audioUri} = useAppContext();
     const [sound, setSound] = useState();
     const [incomingAudio, setIncomingAudio] = useState();
@@ -96,7 +97,7 @@ export default function ResultScreen(): JSX.Element {
             body: formData
         })
             .then(res => res.blob())
-            .then(blob => blobToURI(blob)) // turn the audio file 
+            .then(blob => blobToURI(blob))
             .then(uri => {
                 console.log(uri);
                 setIncomingAudio(uri);
@@ -150,3 +151,5 @@ const styles = StyleSheet.create({
     ttsButtonText: { color: "#87CEFA", fontSize: 16, fontFamily:"inter" },
     button: { borderColor: "#87CEFA", borderWidth: 2, padding: 15, borderRadius: 50, marginTop: 10, width: "80%", alignItems: "center" }
 });
+
+export default ResultScreen;

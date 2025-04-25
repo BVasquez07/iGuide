@@ -7,16 +7,13 @@ import { AVPlaybackSourceObject } from 'expo-av/build/AV';
 import { useEffect, useState } from "react";
 
 export default function TransitionScreen(): JSX.Element {
-    const { setText } = useAppContext();
-    const [inputText, setInputText] = useState("");
     const router = useRouter();
     const [sound, setSound] = useState<Audio.Sound | null>(null);
-    const { routeData, nextPage } = useLocalSearchParams();
-
+    const { routeData, nextPage } = useLocalSearchParams(); // grab the query string params from the url (no need to encode)
     const delayReroute = () => {
         setTimeout(() => {
-            typeof nextPage === 'string' ? router.push(nextPage as any) : console.error("Invalid nextPage value:", nextPage);
-        }, 3000);
+            typeof nextPage === 'string' ? router.push(nextPage as any) : router.push("/ErrorScreen" as any);
+        }, 3500);
         //we need to make a custom error screen that can be used for error handling!
     }
 
@@ -67,11 +64,10 @@ export default function TransitionScreen(): JSX.Element {
             </View>
 
             {/* Title */}
-            <Text style={styles.title}>{routeData}</Text>{/* here is where the dynamic text data will be, along with this data we want to be playing some audio that reads out what is currently happening so we can gen those and put them in assets*/}
-            <Text style={styles.title}>{nextPage}</Text>
+            <Text accessibilityLabel={routeData as string} style={styles.title}>{routeData}</Text>{/* here is where the dynamic text data will be, along with this data we want to be playing some audio that reads out what is currently happening so we can gen those and put them in assets*/}
 
             {/* Loading Indicator */}
-            <ActivityIndicator size="large" color="#70CDFF" />
+            <ActivityIndicator accessibilityLabel={"Loading icon, please wait a couple seconds you will be redirected accordingly"} size="large" color="#70CDFF" />
             {/* Here we want to play the audio that corresponds to this route.*/}
         </View>
     );
