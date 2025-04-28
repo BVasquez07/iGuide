@@ -4,6 +4,7 @@ import { useAppContext } from "../context/AppContext";
 import { Audio } from 'expo-av';
 import { AVPlaybackSourceObject } from 'expo-av/build/AV';
 import * as FileSystem from "expo-file-system";
+import { router } from "expo-router";
 const url = 'http://3.145.65.151:5000/'; //api url whether it be local or deployed.
 
 //helper function
@@ -13,7 +14,7 @@ const blobToURI = async (blob: Blob) => {
     const reader = new FileReader();
     return new Promise((resolve, reject) => {
         reader.onloadend = async () => {
-        const base64Data = reader.result.split(",")[1]; // Extract the Base64 part
+        const base64Data = reader.result.split(",")[1]; // extracts the base64 part of the data URL
         const filePath = `${FileSystem.cacheDirectory}temp-audio-file.mp3`;
 
         try {
@@ -38,19 +39,18 @@ const blobToURI = async (blob: Blob) => {
 };
 
 
-export default function ResultScreen(): JSX.Element {
+
+const ResultScreen = () : JSX.Element => {
     const { imageUri, text, audioUri} = useAppContext();
     const [sound, setSound] = useState();
     const [incomingAudio, setIncomingAudio] = useState();
     const [loading, setLoading] = useState(false);
 
     useEffect(() => { //unload the sound to avoid memory leaks
-        return sound
-        ? () => {
-            console.log('Unloading Sound');
-            sound.unloadAsync(); 
-            }
-        : undefined;
+        return sound ? () => {
+                console.log('Unloading Sound');
+                sound.unloadAsync(); 
+            } : undefined;
     }, [sound]);
 
     useEffect(() => {
@@ -82,10 +82,14 @@ export default function ResultScreen(): JSX.Element {
     const uploadAudio = (uri: string) => {
         //have to fix a couple things here like what the response is on the server side.
         const formData = new FormData();
-
+        console.log(audioUri ? "there is audio" : "empty");
+        console.log(text ? "there is text" : "empty");
+        console.log(imageUri ? "there is an image" : "empty");
         audioUri ?  formData.append("audio", {uri: uri, type: 'audio/m4a', name: 'speech-prompt.m4a'}): null;
         text ? formData.append("text", text): null;
         imageUri ? formData.append("image", {uri: imageUri, type: 'image/jpeg', name: 'image.jpg'}): null;
+
+        console.log(formData.get("text"));
 
         fetch(`${url}incomingPayload`, {
             mode: 'cors',
@@ -93,8 +97,9 @@ export default function ResultScreen(): JSX.Element {
             body: formData
         })
             .then(res => res.blob())
-            .then(blob => blobToURI(blob)) // turn the audio file 
+            .then(blob => blobToURI(blob))
             .then(uri => {
+                console.log(uri);
                 setIncomingAudio(uri);
                 playRecording(uri);
             }) // we can store the response URI so that playback can occur
@@ -104,6 +109,11 @@ export default function ResultScreen(): JSX.Element {
 
     const playBack = () => {
         incomingAudio ? playRecording(incomingAudio) : console.log("No audio to play back");
+    }
+
+    const handleRestart = () => {
+        sound ? sound.unloadAsync() : undefined;    
+        router.push("/HomeScreen");
     }
     
 
@@ -120,8 +130,11 @@ export default function ResultScreen(): JSX.Element {
                 :
                 <>
                     <Text style={styles.text}>{text}</Text>
-                    <TouchableOpacity onPress={playBack} style={styles.ttsButton}>
+                    <TouchableOpacity onPress={playBack} style={styles.button}>
                         <Text style={styles.ttsButtonText}>Replay</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleRestart} style={styles.button}>
+                        <Text style={styles.ttsButtonText}>Something New</Text>
                     </TouchableOpacity>
                 </>
             }
@@ -131,10 +144,12 @@ export default function ResultScreen(): JSX.Element {
 
 const styles = StyleSheet.create({
     container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 20, backgroundColor: "#FFFFFF" },
-    logo: { position: "absolute", top: 40, left: 20, width: 40, height: 40, resizeMode: "contain" },
-    title: { fontSize: 22, fontWeight: "500", marginBottom: 20, color: "#000" },
+    logo: { position: "absolute", top: 2, left: 10, width: 80, height: 50 },
+    title: { fontFamily:"inter",fontSize: 22, fontWeight: "500", marginBottom: 20, color: "#000" },
     image: { width: "90%", height: 200, borderRadius: 10, marginBottom: 20 },
-    text: { fontSize: 16, textAlign: "center", color: "#000", marginBottom: 20 },
-    ttsButton: { backgroundColor: "#007bff", padding: 10, borderRadius: 10, marginTop: 10 },
-    ttsButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+    text: { fontFamily:"inter", fontSize: 16, textAlign: "center", color: "#000", marginBottom: 20 },
+    ttsButtonText: { color: "#87CEFA", fontSize: 16, fontFamily:"inter" },
+    button: { borderColor: "#87CEFA", borderWidth: 2, padding: 15, borderRadius: 50, marginTop: 10, width: "80%", alignItems: "center" }
 });
+
+export default ResultScreen;
