@@ -112,8 +112,11 @@ const ResultScreen = () : JSX.Element => {
     }
 
     const handleRestart = () => {
-        sound ? sound.unloadAsync() : undefined;    
-        router.push("/HomeScreen");
+        const transitionText = 'Navigating back to the home screen so you can ask more questions!'
+        const nextScreen = '/HomeScreen'; // this will be the next screen to navigate to after the image is selected.
+
+        sound ? sound.unloadAsync() : undefined;  
+        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`);
     }
     
 
