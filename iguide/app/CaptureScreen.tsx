@@ -9,6 +9,8 @@ export default function CaptureScreen(): JSX.Element {
     const { setImageUri } = useAppContext();
     const [image, setImage] = useState<string | null>(null);
     const router = useRouter();
+    const transitionText = 'Generating a response to your query! Gimme a sec while I think.'; // this wll depend on whether we have text or voice input.
+    const nextScreen = '/ResultScreen'; // this will be the next screen to navigate to after the image is selected.
 
     // Open Camera to Take a Picture
     const openCamera = async () => {
@@ -55,7 +57,7 @@ export default function CaptureScreen(): JSX.Element {
     const handleImageSelection = (uri: string) => {
         setImage(uri);
         setImageUri(uri);
-        router.push("/ResultScreen"); // Navigate to ResultScreen
+        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`);
     };
 
     const handleNoImage = () => {

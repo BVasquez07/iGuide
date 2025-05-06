@@ -13,7 +13,7 @@ export default function TransitionScreen(): JSX.Element {
     const delayReroute = () => {
         setTimeout(() => {
             typeof nextPage === 'string' ? router.push(nextPage as any) : router.push("/ErrorScreen" as any);
-        }, 3500);
+        }, 2600);
         //we need to make a custom error screen that can be used for error handling!
     }
 
