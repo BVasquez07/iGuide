@@ -60,8 +60,8 @@ export default function CaptureScreen(): JSX.Element {
         router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`);
     };
 
-    const handleNoImage = () => {
-        router.push("/ResultScreen"); //navigate to the result screen without image.
+    const handleNoImage = () => { 
+        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`);
     };
 
     return (
