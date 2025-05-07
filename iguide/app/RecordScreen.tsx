@@ -22,7 +22,8 @@ export default function RecordScreen(): JSX.Element {
     const [displayHoldPrompt, setDisplayHoldPrompt] = useState(true); //be default should be true so the user knows what to do.
 
     const transitionText = 'Prepare to snap a picture of the object!'; // this wll depend on whether we have text or voice input.
-    const nextScreen = '/CaptureScreen'; 
+    const nextScreen = '/CaptureScreen';
+    const transitionAudio = 'snapImage'; // this will be the next screen to navigate to after the image is selected. 
 
 
     async function startRecording() {
@@ -65,7 +66,7 @@ export default function RecordScreen(): JSX.Element {
         uri ? await cacheAudio(uri) : null; //cache the audio file to the device
         console.log('Recording stopped and stored at', uri);
         setIsRecording(false);
-        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`);
+        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}&audio=${encodeURIComponent(transitionAudio)}`);
     };
     const handlePressIn = () => {
         setDisplayListening(true);

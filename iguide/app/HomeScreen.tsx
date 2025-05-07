@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useAppContext } from "../context/AppContext";
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import { AVPlaybackSourceObject } from 'expo-av/build/AV';
+
 const greetingFiles = [
     require("../assets/audio/gptRes0.wav"),
     require("../assets/audio/gptRes1.wav"),
@@ -45,22 +46,25 @@ export default function HomeScreen(): JSX.Element {
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     let transitionText; // this wll depend on whether we have text or voice input.
     let nextScreen; 
+    let transitionAudio;
 
     const handleTextSubmit = () => {
         
         if (inputText.trim()) {
             transitionText = "Prepare to snap a picture of the object!"; // this wll depend on whether we have text or voice input.
             nextScreen = "/CaptureScreen"; 
+            transitionAudio = "snapImage"
             setText(inputText);
             Keyboard.dismiss();
-            router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`); // Navigate to TransitionScreen with the input text as a query parameter
+            router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}&audio=${encodeURIComponent(transitionAudio)}`); // Navigate to TransitionScreen with the input text as a query parameter
         }
     };
     
     const handleVoiceSubmit = () => {
         transitionText = "Prepare to record your voice!"; // this wll depend on whether we have text or voice input.
         nextScreen = "/RecordScreen"; 
-        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}`);
+        transitionAudio = "recordVoice"
+        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}&audio=${encodeURIComponent(transitionAudio)}`);
     }
 
     useEffect(() => { //unload the sound to avoid memory leaks

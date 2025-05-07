@@ -5,19 +5,46 @@ import { useAppContext } from "../context/AppContext";
 import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import { AVPlaybackSourceObject } from 'expo-av/build/AV';
 import { useEffect, useState } from "react";
+interface transitionAudio {
+    "recordVoice": string,
+    "snapImage": string,
+    "restart": string,
+    "result": string,
+}
+
+
 
 export default function TransitionScreen(): JSX.Element {
     const router = useRouter();
+
+    const transitionAudio: transitionAudio = { //map to get the proper impoort for the audio file based on the incomuing search param!
+        "recordVoice": require("../assets/audio/recordVoice.wav"),
+        "snapImage": require("../assets/audio/snapImage.wav"),
+        "restart": require("../assets/audio/restart.wav"),
+        "result": require("../assets/audio/result.wav"),
+    }
+
     const [sound, setSound] = useState<Audio.Sound | null>(null);
-    const { routeData, nextPage } = useLocalSearchParams(); // grab the query string params from the url (no need to encode)
+    const { routeData, nextPage, audio } = useLocalSearchParams(); // grab the query string params from the url (no need to encode)
+    const audioSource = transitionAudio[audio]
+    console.log("This is the audio sent " + audio)
+    
     const delayReroute = () => {
         setTimeout(() => {
             typeof nextPage === 'string' ? router.push(nextPage as any) : router.push("/ErrorScreen" as any);
-        }, 2600);
+        }, 3100);
         //we need to make a custom error screen that can be used for error handling!
     }
 
+    useEffect(() => { //unload the sound to avoid memory leaks
+        return sound ? () => {
+                console.log('Unloading Sound');
+                sound.unloadAsync(); 
+            } : undefined;
+    }, [sound]);
+    
     useEffect(() => {
+        playRecording(audioSource);
         delayReroute();
     }, [])
     console.log(routeData, nextPage)
