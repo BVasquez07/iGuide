@@ -45,6 +45,10 @@ const ResultScreen = () : JSX.Element => {
     const [sound, setSound] = useState();
     const [incomingAudio, setIncomingAudio] = useState();
     const [loading, setLoading] = useState(false);
+    const transitionText = 'Navigating back to the home screen so you can ask more questions!'
+    const nextScreen = '/HomeScreen'; 
+    const transitionAudio = 'restart';
+
 
     useEffect(() => { //unload the sound to avoid memory leaks
         return sound ? () => {
@@ -112,8 +116,8 @@ const ResultScreen = () : JSX.Element => {
     }
 
     const handleRestart = () => {
-        sound ? sound.unloadAsync() : undefined;    
-        router.push("/HomeScreen");
+        sound ? sound.unloadAsync() : undefined;  
+        router.push(`/TransitionScreen?routeData=${encodeURIComponent(transitionText)}&nextPage=${encodeURIComponent(nextScreen)}&audio=${encodeURIComponent(transitionAudio)}`);
     }
     
 
